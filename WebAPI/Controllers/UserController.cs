@@ -8,11 +8,11 @@ namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class VaaaNController : Controller
+    public class UserController : Controller
     {
         private readonly MyDbContext context;
 
-        public VaaaNController(MyDbContext context)
+        public UserController(MyDbContext context)
         {
             this.context = context;
         }
@@ -21,7 +21,7 @@ namespace WebAPI.Controllers
         {
             var ep = context.empapi.ToList();
             JsonResult r = new JsonResult(ep);
-            var jsondata = JsonConvert.SerializeObject(r);
+            //var jsondata = JsonConvert.SerializeObject(r);
             return Ok(ep);
         }
 
