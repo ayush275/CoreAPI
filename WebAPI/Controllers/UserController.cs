@@ -25,7 +25,8 @@ namespace WebAPI.Controllers
             return Ok(ep);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet]
+        [Route("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
             try
@@ -43,6 +44,8 @@ namespace WebAPI.Controllers
             }
         }
 
+
+
         [HttpPost]
         public async Task<IActionResult> Post(Emp ep)
         {
@@ -57,17 +60,57 @@ namespace WebAPI.Controllers
             context.SaveChanges();
             return Ok();
         }
+
+        [HttpPost]
+        [Route("Login")]
+        public async Task<IActionResult> Sign(login ep)
+        {
+            var emp = await context.empapi.FirstOrDefaultAsync(e => e.name == ep.Name); 
+
+            if (emp == null)
+            {
+                return NotFound();
+            }
+            return Ok(emp);
+
+        }
+     
+        [HttpPost]
+        [Route("{id}")]
+        public async Task<IActionResult> Put(int id, Emp ep)
+        {
+            var emp = await context.empapi.FindAsync(id);
+
+            if (emp == null)
+            {
+                return NotFound();
+            }
+
+            // Update the properties of the existing employee
+            emp.Id = emp.Id;
+            emp.name = ep.name;
+            emp.lastname = ep.lastname;
+            emp.departement = ep.departement;
+
+            context.empapi.Update(emp);
+            await context.SaveChangesAsync();
+
+            return Ok();
+        }
         [HttpDelete]
         [Route("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                var emp = await context.empapi.FirstOrDefaultAsync(e => e.Id == id);
+                var emps = new Emp();
+                  var emp = await context.empapi.FirstOrDefaultAsync(e => e.Id == id);
                 if (emp == null)
                 {
                     return NotFound();
                 }
+                emps.name=emp.name;
+           
                 context.empapi.Remove(emp);
                 await context.SaveChangesAsync();
                 return NoContent();
