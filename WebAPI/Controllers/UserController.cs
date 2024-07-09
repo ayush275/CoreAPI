@@ -23,6 +23,7 @@ namespace WebAPI.Controllers
             this.context = context;
             this.configuration = configuration;
         }
+
         [Authorize]
         [HttpGet]
         public async Task<IActionResult> Get()
@@ -33,7 +34,7 @@ namespace WebAPI.Controllers
             //var jsondata = JsonConvert.SerializeObject(r);
             return Ok(ep);
         }
-
+        [Authorize]
         [HttpGet]
         [Route("{id}")]
         public async Task<IActionResult> GetById(int id)
@@ -53,7 +54,7 @@ namespace WebAPI.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
-
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Post(Emp ep)
         {
@@ -76,32 +77,29 @@ namespace WebAPI.Controllers
         {
             //login user then  name find empapi table 
             var emp = await context.empapi.FirstOrDefaultAsync(e => e.name == ep.Name); 
-
             if (emp == null)
             {
                 return NotFound();
             }
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub,configuration["Jwt:Subject"]),
-                 new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
+               new Claim(JwtRegisteredClaimNames.Sub,configuration["Jwt:Subject"]),
+                new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
                  new Claim("UserId",ep.Name),
                   new Claim("Password",ep.Password),
-
             };
             var Key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]));
             var signIn = new SigningCredentials(Key, SecurityAlgorithms.HmacSha256);
-            var token = new JwtSecurityToken(
+            var Token = new JwtSecurityToken(
                 configuration["Jwt:Issuer"],
                 configuration["Jwt:Audiance"],
-                claims,
-                expires: DateTime.UtcNow.AddMinutes(60),
+                claims,               
+                expires: DateTime.Now.AddMinutes(5),
                 signingCredentials: signIn
                 );
-            string tokenvalue=new JwtSecurityTokenHandler().WriteToken(token);
-            return Ok(new { Token = tokenvalue, User = emp });
+            string tokenvalue=new JwtSecurityTokenHandler().WriteToken(Token);
+            return Ok(new { token = tokenvalue});
             //return Ok(emp);
-
         }
      
         [HttpPost]
@@ -147,8 +145,6 @@ namespace WebAPI.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
-
-
 
     }
 }
