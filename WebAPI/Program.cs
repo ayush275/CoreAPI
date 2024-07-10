@@ -11,11 +11,9 @@ builder.Services.AddCors(options =>
 
 {
     options.AddDefaultPolicy(
-
         policy =>
         {
             policy.WithOrigins("*").WithMethods("*").WithHeaders("*");
- 
         });
 });
 
@@ -47,6 +45,8 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
 var app = builder.Build();
 app.UseCors();
 
